@@ -1,0 +1,58 @@
+module uart_top (
+    input  wire clk,            // System clock (e.g., 50 MHz)
+    input  wire reset,          // Asynchronous reset
+    input  wire rxd,            // Serial input from external UART
+    output wire txd,            // Serial output to external UART
+
+    // TX interface
+    input  wire [7:0] data_in,  // Parallel data to transmit
+    input  wire transmit,       // Transmit request
+    output wire tx_busy,        // TX busy flag
+
+    // RX interface
+    output wire [7:0] data_out, // Received parallel data
+    output wire valid_rx,       // Valid RX flag
+    output wire parity_error,   // RX parity error
+    output wire stop_error      // RX stop bit error
+);
+
+    // Internal wires
+    wire oversample_tick;
+    wire bit_tick;
+
+    // === Instantiate baud tick generator (shared for TX and RX) ===
+    uart_oversample_tick_gen #(
+        .CLK_FREQ(50000000),
+        .BAUD_RATE(9600),
+        .OVER(16)
+    ) baud_gen (
+        .clk(clk),
+        .reset(reset),
+        .oversample_tick(oversample_tick), // unused (for oversampled RX)
+        .bit_tick(bit_tick)                // used as TX and RX baud tick
+    );
+
+    // === UART Transmitter ===
+    uart_tx tx_inst (
+        .clk(clk),
+        .reset(reset),
+        .transmit(transmit),
+        .data_in(data_in),
+        .tx(txd),            // connect to external txd pin
+        .busy(tx_busy),
+        .TX_baud_tick(bit_tick)
+    );
+
+    // === UART Receiver ===
+    uart_rx rx_inst (
+        .clk(clk),
+        .reset(reset),
+        .rxd(rxd),           // connect to external rxd pin
+        .RX_baud_tick(oversample_tick),
+        .data_out(data_out),
+        .valid_rx(valid_rx),
+        .parity_error(parity_error),
+        .stop_error(stop_error)
+    );
+
+endmodule

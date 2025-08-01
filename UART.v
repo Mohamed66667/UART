@@ -1,7 +1,6 @@
-module uart_top (
+module TOP_MOD (
     input  wire clk,            // System clock (e.g., 50 MHz)
     input  wire reset,          // Asynchronous reset
-    input  wire rxd,            // Serial input from external UART
     output wire txd,            // Serial output to external UART
 
     // TX interface
@@ -15,7 +14,16 @@ module uart_top (
     output wire parity_error,   // RX parity error
     output wire stop_error      // RX stop bit error
 );
+wire [10:0] tx_reg_debug;
+wire [10:0] rx_reg_debug;
+wire [3:0]  rx_counter2;
+wire [3:0]  align_counter2;
 
+
+assign rx_counter2 = rx_inst.rx_counter;
+assign align_counter2 = rx_inst.align_counter;
+assign tx_reg_debug = tx_inst.TX_shift_reg;
+assign rx_reg_debug = rx_inst.rx_shift_reg;
     // Internal wires
     wire oversample_tick;
     wire bit_tick;
@@ -34,21 +42,22 @@ module uart_top (
 
     // === UART Transmitter ===
     uart_tx tx_inst (
-        .clk(clk),
+        .clk(bit_tick),
         .reset(reset),
         .transmit(transmit),
         .data_in(data_in),
         .tx(txd),            // connect to external txd pin
-        .busy(tx_busy),
-        .TX_baud_tick(bit_tick)
+        .busy(tx_busy)
+        
     );
 
     // === UART Receiver ===
     uart_rx rx_inst (
-        .clk(clk),
+         .oversample_tick(oversample_tick), 
+        .bit_tick(bit_tick) ,
         .reset(reset),
-        .rxd(rxd),           // connect to external rxd pin
-        .RX_baud_tick(oversample_tick),
+        .rxd(txd),           // connect to external rxd pin
+   
         .data_out(data_out),
         .valid_rx(valid_rx),
         .parity_error(parity_error),

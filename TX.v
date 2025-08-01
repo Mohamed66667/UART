@@ -1,11 +1,11 @@
-module uart_tx #(parameter start_bit=0,parameter stop_bit=1) (
+module uart_tx(
     input  clk,              // system clock
     input  reset,            // async reset
     input  transmit,         // load signal to send data
     input  [7:0] data_in,    // 8-bit parallel data
     output reg tx,               // serial output
-    output reg busy,             // transmitter busy signal
-    input  TX_baud_tick         // 1-cycle pulse at baud rate
+    output reg busy           // transmitter busy signal
+
 );
 reg [3:0] TX_bit_index;   
 reg [10:0] TX_shift_reg;// full frame: (start, data[0-7],paritybit, stop)
@@ -23,10 +23,10 @@ always@(posedge clk or posedge reset)begin
     else begin
             if (transmit && !busy) begin
                 // Load full frame: start(0), data_in (LSB first), stop(1)
-                TX_shift_reg <= {stop_bit,Tx_paritybit, data_in,start_bit}; // MSB first = Stop, Data, Start
+                TX_shift_reg <= {1'b1,Tx_paritybit, data_in,1'b0}; // MSB first = Stop, Data, Start
                 busy <= 1;
                 TX_bit_index <= 0;
-            end else if (busy && TX_baud_tick  ) begin
+            end else if (busy ) begin
                 tx <= TX_shift_reg[0];               // send LSB first
                 TX_shift_reg <= {1'b0,TX_shift_reg[10:1] }; // shift right
                 TX_bit_index <= TX_bit_index+ 1;

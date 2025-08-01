@@ -1,33 +1,4 @@
-/*module baud_tick_gen (
-    input  clk,             // system clock
-    input  reset,           // asynchronous reset
-    output reg baud_tick        // 1-cycle pulse at baud rate
-);
 
-    
-    parameter CLK_FREQ = 50000000;  // 50 MHz
-    parameter BAUD_RATE = 9600;     // 9600 bps
-    parameter DIVISOR = CLK_FREQ / BAUD_RATE;
-
-    // For DIVISOR ≈ 5208, 13 bits are enough (2^13 = 8192)
-    reg [12:0] counter;
-
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            counter <= 0;
-            baud_tick <= 0;
-        end else begin
-            if (counter == DIVISOR - 1) begin
-                counter <= 0;
-                baud_tick <= 1;
-            end else begin
-                counter <= counter + 1;
-                baud_tick <= 0;
-            end
-        end
-    end
-
-endmodule*/
 module uart_oversample_tick_gen (
     input wire clk,               // system clock (e.g., 50 MHz)
     input wire reset,             // async reset
@@ -72,5 +43,3 @@ module uart_oversample_tick_gen (
     end
 
 endmodule
-
-

@@ -48,7 +48,7 @@ module help;
 
         // Wait a bit then transmit a byte
         #200;
-        data_in = 8'hA5;  // 10100101
+        data_in = 8'h3e;  // 10100101
         transmit = 1;
 
         #(50000*20);              // 1 clk cycle
@@ -60,7 +60,7 @@ module help;
         if (valid_rx) begin
             $display("Received: %h", data_out);
             if (parity_error)
-                $display("Parity Error!");
+                $display("Parity Error!,tx_parity=%h,rx_parit=%h",uut.Tx_paritybit2,uut.Rx_paritybit2);
             if (stop_error)
                 $display("Stop Bit Error!");
         end else begin

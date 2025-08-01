@@ -75,8 +75,7 @@ module uart_rx (
                     sample_enable  <= 0;
 
                     data_out       <= rx_shift_reg[8:1];
-                    Rx_paritybit   <= ^rx_shift_reg[8:1];
-                    parity_error   <= (rx_shift_reg[9] != Rx_paritybit);
+                    parity_error <= (rx_shift_reg[9] != ^rx_shift_reg[8:1]);
                     stop_error     <= (rxd != 1);
                     valid_rx       <= 1;
                 end

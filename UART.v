@@ -18,8 +18,12 @@ wire [10:0] tx_reg_debug;
 wire [10:0] rx_reg_debug;
 wire [3:0]  rx_counter2;
 wire [3:0]  align_counter2;
+wire Tx_paritybit2;
+wire Rx_paritybit2;
 
 
+assign Tx_paritybit2=tx_inst.Tx_paritybit;
+assign Rx_paritybit2=rx_inst.Rx_paritybit;
 assign rx_counter2 = rx_inst.rx_counter;
 assign align_counter2 = rx_inst.align_counter;
 assign tx_reg_debug = tx_inst.TX_shift_reg;
